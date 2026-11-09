@@ -1,0 +1,101 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:'Anton';src:url('tools/Anton-Regular.ttf');}
+html,body{margin:0;background:#000}
+canvas{display:block}
+</style></head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+// ===== head.html v4 (30.10.2026): Visual-Upgrade – Tiefe/Schatten, Kamera-Punch + Shake, SEO-Titel, kräftigere helle Farben =====
+const W=1080,H=1920;
+const C=document.getElementById('c'), X=C.getContext('2d');
+const COL={skyT:'#7CCBFF',skyB:'#FFF4DC',wall:'#E9EEF2',shade:'#B8C4CE',red:'#F02D2D',orange:'#FF7A1A',blue:'#1683E8',yellow:'#FFC81F',dark:'#1A2228',cream:'#FFF4DC',green:'#1FB86A',purple:'#7B4DF5',grey:'#7E8890',suit:'#7FB2DE',skin:'#F2C9A0'};
+let TL=null, EVENTS=[], SHAKES=[], TITLE=null;
+let HANDLE='@leverlogic';
+// SMOOTH (05.11.2026, Erzähl-Mechanik): weiche Überblendung ohne Weißblitz, ohne Zoom-Punch, ohne Whoosh pro Szene
+let SMOOTH=false;
+const off=[document.createElement('canvas'),document.createElement('canvas')];
+off.forEach(o=>{o.width=W;o.height=H;});
+
+// ---------- helpers ----------
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+const eo=x=>1-Math.pow(1-clamp(x),3);
+const eio=x=>{x=clamp(x);return x<0.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;};
+const back=x=>{x=clamp(x);const c1=1.9,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2);};
+const lerp=(a,b,p)=>a+(b-a)*p;
+function W0(scene,word,nth=0){let n=0;for(const w of TL.words){if(w.scene===scene&&w.w===word){if(n===nth)return w.t0;n++;}}throw new Error('word '+scene+' '+word);}
+function S(name){return TL.scenes.find(s=>s.name===name);}
+// boom-Events lösen automatisch einen Kamera-Shake aus
+function ev(t,type){EVENTS.push({t:+t.toFixed(3),type});if(type==='boom')SHAKES.push(t);return t;}
+function popS(t,t0,d=0.28){if(t<t0)return 0;return back((t-t0)/d);}
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+function withScale(c,x,y,s,f){if(s<=0.001)return;c.save();c.translate(x,y);c.scale(s,s);f();c.restore();}
+// Tiefe: weicher Bodenschatten + Objektschatten
+function ground(c,x,y,rx,ry=rx*0.16,a=0.22){c.save();const g=c.createRadialGradient(x,y,0,x,y,rx);g.addColorStop(0,`rgba(26,34,40,${a})`);g.addColorStop(1,'rgba(26,34,40,0)');c.fillStyle=g;c.translate(x,y);c.scale(1,ry/rx);c.translate(-x,-y);c.beginPath();c.arc(x,y,rx,0,Math.PI*2);c.fill();c.restore();}
+function lifted(c,f,blur=34,oy=20,a=0.22){c.save();c.shadowColor=`rgba(26,34,40,${a})`;c.shadowBlur=blur;c.shadowOffsetY=oy;f();c.restore();}
+// leichtes Schweben für Vordergrund-Objekte
+const bob=(t,amp=6,sp=2.2,ph=0)=>Math.sin(t*sp+ph)*amp;
+function chip(c,t,t0,text,x,y,dark=true,size=44){const s=popS(t,t0);withScale(c,x,y,s,()=>{c.font=`700 ${size}px Inter`;const tw=c.measureText(text).width;const pw=tw+size*1.1,ph=size*1.8;
+ c.fillStyle='rgba(26,34,40,0.18)';rr(c,-pw/2+6,-ph/2+8,pw,ph,ph/2);c.fill();
+ c.fillStyle=dark?COL.dark:'#fff';rr(c,-pw/2,-ph/2,pw,ph,ph/2);c.fill();
+ if(!dark){c.lineWidth=5;c.strokeStyle=COL.dark;c.stroke();}
+ c.fillStyle=dark?'#fff':COL.dark;c.textAlign='center';c.textBaseline='middle';c.fillText(text,0,3);});}
+function stamp(c,t,t0,text,x,y,color=COL.red,size=130,rot=-0.12){if(t<t0)return;const p=clamp((t-t0)/0.22);const s=p<1?2.2-1.2*eo(p):1+0.02*Math.sin((t-t0)*6);const a=clamp((t-t0)/0.1);
+ c.save();c.globalAlpha=a;c.translate(x,y);c.rotate(rot);c.scale(s,s);c.font=`${size}px Anton`;const tw=c.measureText(text).width;const pw=tw+70,ph=size*1.45;
+ c.shadowColor='rgba(26,34,40,0.3)';c.shadowBlur=24;c.shadowOffsetY=14;
+ c.fillStyle=color;rr(c,-pw/2,-ph/2,pw,ph,22);c.fill();c.shadowColor='transparent';c.lineWidth=7;c.strokeStyle=COL.dark;c.stroke();
+ c.lineWidth=4;c.strokeStyle='rgba(255,255,255,0.8)';rr(c,-pw/2+16,-ph/2+16,pw-32,ph-32,12);c.stroke();
+ c.fillStyle='#fff';c.textAlign='center';c.textBaseline='middle';c.lineWidth=8;c.strokeStyle=COL.dark;c.strokeText(text,0,6);c.fillText(text,0,6);c.restore();}
+function arrow(c,x1,y1,x2,y2,p,color=COL.red,w=18){if(p<=0)return;const x=x1+(x2-x1)*p,y=y1+(y2-y1)*p;c.save();c.lineCap='round';
+ c.strokeStyle=COL.dark;c.lineWidth=w+10;c.beginPath();c.moveTo(x1,y1);c.lineTo(x,y);c.stroke();c.strokeStyle=color;c.lineWidth=w;c.beginPath();c.moveTo(x1,y1);c.lineTo(x,y);c.stroke();
+ const a=Math.atan2(y2-y1,x2-x1);c.translate(x,y);c.rotate(a);c.fillStyle=color;c.strokeStyle=COL.dark;c.lineWidth=6;c.beginPath();c.moveTo(w*2.2,0);c.lineTo(-w*0.6,-w*1.6);c.lineTo(-w*0.6,w*1.6);c.closePath();c.fill();c.stroke();c.restore();}
+// Erklär-Callout: Linie von Objekt zu Label-Karte
+function callout(c,t,t0,x1,y1,x2,y2,text,col=COL.red,size=40){if(t<t0)return;const p=eo((t-t0)/0.3);c.save();c.strokeStyle=COL.dark;c.lineWidth=6;c.setLineDash([14,10]);c.beginPath();c.moveTo(x1,y1);c.lineTo(lerp(x1,x2,p),lerp(y1,y2,p));c.stroke();c.setLineDash([]);
+ c.fillStyle=col;c.beginPath();c.arc(x1,y1,12,0,7);c.fill();c.lineWidth=5;c.stroke();c.restore();if(p>0.6)chip(c,t,t0+0.18,text,x2,y2,false,size);}
+function bigText(c,text,x,y,size,fill=COL.dark,stroke=null,align='center'){c.save();c.font=`${size}px Anton`;c.textAlign=align;c.textBaseline='middle';if(stroke){c.lineJoin='round';c.lineWidth=size*0.12;c.strokeStyle=stroke;c.strokeText(text,x,y);}c.fillStyle=fill;c.fillText(text,x,y);c.restore();}
+function label(c,text,x,y,size=36,col=COL.dark,align='center'){c.save();c.font=`800 ${size}px Inter`;c.fillStyle=col;c.textAlign=align;c.textBaseline='middle';c.fillText(text,x,y);c.restore();}
+function counterEv(t0,dur,steps=8){for(let i=0;i<steps;i++)ev(t0+i*dur/steps,'tick');ev(t0+dur,'ding');}
+function mixHex(a,b,p){const pa=[1,3,5].map(i=>parseInt(a.substr(i,2),16)),pb=[1,3,5].map(i=>parseInt(b.substr(i,2),16));return 'rgb('+pa.map((v,i)=>Math.round(lerp(v,pb[i],clamp(p)))).join(',')+')';}
+const fmt=n=>Math.round(n).toLocaleString('en-US');
+function cnt(c,x,y,val,unit,col=COL.red,w=560){c.save();c.translate(x,y);c.fillStyle='rgba(26,34,40,0.18)';rr(c,-w/2+8,-100,w,200,34);c.fill();c.fillStyle='#fff';c.strokeStyle=COL.dark;c.lineWidth=12;rr(c,-w/2,-110,w,200,34);c.fill();c.stroke();bigText(c,val,0,-25,110,col,COL.dark);label(c,unit,0,52,32,COL.grey);c.restore();}
+
+// ---------- backgrounds ----------
+function sky(c,t){const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,COL.skyT);g.addColorStop(0.75,COL.skyB);g.addColorStop(1,COL.skyB);c.fillStyle=g;c.fillRect(0,0,W,H);
+ c.fillStyle='rgba(255,255,255,0.75)';[[180,260,1],[820,180,0.8],[560,380,0.6],[300,1150,0.9],[900,1000,0.7]].forEach(([x,y,s],i)=>{const xx=(x-t*60*(i%3+1))%(W+300);const X2=xx<-150?xx+W+300:xx;c.beginPath();c.ellipse(X2,y,110*s,40*s,0,0,7);c.ellipse(X2+70*s,y-20*s,80*s,45*s,0,0,7);c.ellipse(X2-60*s,y+5*s,70*s,32*s,0,0,7);c.fill();});}
+function paper(c){c.fillStyle='#FFF8EA';c.fillRect(0,0,W,H);c.strokeStyle='rgba(30,144,224,0.10)';c.lineWidth=2;for(let x=0;x<W;x+=60){c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke();}for(let y=0;y<H;y+=60){c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke();}}
+// weiche Vignette, hält den Blick in der Mitte (bleibt hell)
+function vignette(c){const g=c.createRadialGradient(540,900,500,540,900,1250);g.addColorStop(0,'rgba(255,255,255,0)');g.addColorStop(1,'rgba(26,34,40,0.13)');c.fillStyle=g;c.fillRect(0,0,W,H);}
+
+// LeverLogic logo (eye with gear iris)
+function logo(c,x,y,r,t){c.save();c.translate(x,y);c.fillStyle=COL.yellow;c.beginPath();c.arc(0,0,r,0,7);c.fill();c.lineWidth=r*0.04;c.strokeStyle='#E0B400';c.stroke();
+ const s=r/150;c.scale(s,s);c.strokeStyle=COL.dark;c.lineCap='round';c.lineWidth=14;[-0.35,0,0.35].forEach(a=>{c.beginPath();c.moveTo(Math.sin(a)*70,-62);c.lineTo(Math.sin(a)*110,-100-(a===0?6:0));c.stroke();});
+ c.beginPath();c.moveTo(-112,0);c.quadraticCurveTo(0,-118,112,0);c.quadraticCurveTo(0,118,-112,0);c.closePath();c.fillStyle='#fff';c.fill();
+ c.save();c.clip();c.fillStyle=COL.red;c.beginPath();const n=12;for(let i=0;i<n*2;i++){const a=i*Math.PI/n+t*0.6;const rr2=i%2?44:54;c.lineTo(Math.cos(a)*rr2,Math.sin(a)*rr2);}c.closePath();c.fill();c.lineWidth=5;c.stroke();
+ c.fillStyle=COL.yellow;for(let i=0;i<4;i++){const a=i*Math.PI/2+t*0.6;c.beginPath();c.arc(Math.cos(a)*30,Math.sin(a)*30,5,0,7);c.fill();}
+ c.fillStyle=COL.dark;c.beginPath();c.arc(0,0,20,0,7);c.fill();c.fillStyle='#fff';c.beginPath();c.arc(6,-7,6,0,7);c.fill();c.restore();
+ c.lineWidth=14;c.beginPath();c.moveTo(-112,0);c.quadraticCurveTo(0,-118,112,0);c.quadraticCurveTo(0,118,-112,0);c.closePath();c.stroke();c.restore();}
+
+// ---------- MID-VIDEO CTA (seit 08.11.2026 nicht mehr verwenden) ----------
+function ctaEvents(){const s=S('cta');const ct={in:ev(s.t0-0.12,'swipe')};ct.btn=ev(W0('cta','FOLLOW')+0.3,'pop');ct.tap=ev(ct.btn+0.45,'tick');ct.out=s.t1+0.05;return ct;}
+function ctaOverlay(c,t,ct){if(t<ct.in)return;const pin=eo((t-ct.in)/0.35);const pout=t>ct.out?eo((t-ct.out)/0.25):0;const y=lerp(-200,330,pin)-pout*560;
+ c.save();c.translate(540,y);
+ c.shadowColor='rgba(26,34,40,0.28)';c.shadowBlur=30;c.shadowOffsetY=16;
+ c.fillStyle='#fff';rr(c,-460,-118,920,228,60);c.fill();c.shadowColor='transparent';c.strokeStyle=COL.dark;c.lineWidth=10;c.stroke();
+ logo(c,-330,-4,82,t);c.lineWidth=7;c.strokeStyle=COL.dark;c.beginPath();c.arc(-330,-4,82,0,7);c.stroke();
+ c.fillStyle=COL.dark;c.font='800 66px Inter';c.textAlign='left';c.textBaseline='middle';c.fillText('leverlogic',-222,-2);
+ const bs=popS(t,ct.btn,0.35)*(1+0.06*Math.sin(t*8));withScale(c,300,-4,bs,()=>{c.fillStyle=COL.red;c.strokeStyle=COL.dark;c.lineWidth=8;rr(c,-130,-52,260,104,52);c.fill();c.stroke();
+  c.fillStyle='#fff';c.font='54px Anton';c.textAlign='center';c.textBaseline='middle';c.lineWidth=6;c.strokeText('FOLLOW',0,4);c.fillText('FOLLOW',0,4);});
+ c.restore();}
+function ctaScene(bg,ct){return (c,t)=>{bg(c,t);ctaOverlay(c,t,ct);};}
+function thumbHeadline(c,l1,l2,y=420){c.save();c.font='128px Anton';const mw=Math.max(c.measureText(l1).width,c.measureText(l2).width);const k=Math.min(1,960/mw);
+ c.translate(540,y);c.scale(k,k);c.textAlign='center';c.textBaseline='middle';c.lineJoin='round';c.lineWidth=24;c.strokeStyle='#000';
+ [[l1,0,'#fff'],[l2,150,COL.yellow]].forEach(([s,yy,col])=>{c.strokeText(s,0,yy);c.fillStyle=col;c.fillText(s,0,yy);});c.restore();}
+// SEO-Titel im Video (Regel 30.10.2026): exakter Suchbegriff fest eingeblendet in den ersten Sekunden.
+// In scenes.js setzen: TITLE={l1:'...',l2:'...',end:<Sek>}; y=400 liegt unter der TikTok-Suchleiste.
+function titleBar(c,t){if(!TITLE||t>TITLE.end+0.35)return;const pin=popS(t,0.05,0.4);const pout=t>TITLE.end?eo((t-TITLE.end)/0.3):0;
+ c.save();c.globalAlpha=1-pout;c.translate(540,400-pout*60);c.scale(pin,pin);c.font='76px Anton';
+ const mw=Math.max(c.measureText(TITLE.l1).width,c.measureText(TITLE.l2).width);const k=Math.min(1,900/mw);const bw=mw*k+90,bh=230;
+ c.shadowColor='rgba(26,34,40,0.3)';c.shadowBlur=30;c.shadowOffsetY=16;c.fillStyle='#fff';rr(c,-bw/2,-bh/2,bw,bh,40);c.fill();c.shadowColor='transparent';c.lineWidth=7;c.strokeStyle=COL.dark;c.stroke();
+ c.scale(k,k);c.textAlign='center';c.textBaseline='middle';c.fillStyle=COL.dark;c.fillText(TITLE.l1,0,-46);c.fillStyle=COL.red;c.fillText(TITLE.l2,0,50);c.restore();}

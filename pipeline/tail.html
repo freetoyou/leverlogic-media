@@ -1,0 +1,32 @@
+ if(!SMOOTH)TL.scenes.forEach((s,i)=>{if(i>0)ev(bound(i)-0.1,"whoosh");});
+}
+function bound(i){const a=TL.scenes[i-1].t1,b=TL.scenes[i].t0;return (a+b)/2;}
+function sceneIndex(t){let i=0;for(let j=1;j<TL.scenes.length;j++){if(t>=bound(j))i=j;}return i;}
+
+// ---------- subtitles (v4: ca. 25 % kleiner, tiefer, Schlüsselwort gelb + Puls) ----------
+function subtitle(c,t){let cur=null;for(const w of TL.words){if(t>=w.t0-0.02)cur=w;}if(!cur)return;
+ const nxt=TL.words[TL.words.indexOf(cur)+1];const end=nxt&&nxt.scene===cur.scene?nxt.t0:cur.t1+0.35;if(t>end)return;
+ const p=clamp((t-cur.t0)/0.1);const s=(cur.k?1.4:1.25)-(cur.k?0.4:0.25)*p;c.save();c.translate(540,1500);c.scale(s,s);c.font='104px Anton';c.textAlign='center';c.textBaseline='middle';
+ c.lineJoin='round';c.shadowColor='rgba(0,0,0,0.4)';c.shadowOffsetY=7;c.shadowBlur=12;c.lineWidth=20;c.strokeStyle='#000';c.strokeText(cur.w,0,0);c.shadowColor='transparent';
+ c.fillStyle=cur.k?COL.yellow:'#fff';c.fillText(cur.w,0,0);c.restore();}
+
+// ---------- frame (v4: Kamera-Punch pro Szene, langsamer Drift, Shake bei boom) ----------
+function drawScene(i,ctx,t){ctx.save();ctx.clearRect(0,0,W,H);SC[TL.scenes[i].name](ctx,t);ctx.restore();}
+function isCta(i){return TL.scenes[i]&&TL.scenes[i].name==='cta';}
+function shake(t){let a=0;for(const s of SHAKES){const d=t-s;if(d>=0&&d<0.32)a=Math.max(a,18*(1-d/0.32));}return [Math.sin(t*93)*a,Math.cos(t*71)*a*0.7];}
+function render(t){const i=sceneIndex(t);
+ const st=i===0?0:bound(i);const punch=(isCta(i)||SMOOTH)?0:0.07*(1-eo((t-st)/0.5));const z=1+punch+0.035*clamp((t-st)/6);
+ const [sx,sy]=shake(t);
+ drawScene(i,off[0].getContext('2d'),t);X.save();X.fillStyle='#fff';X.fillRect(0,0,W,H);X.translate(540+sx,960+sy);X.scale(z,z);X.translate(-540,-960);X.drawImage(off[0],0,0);X.restore();
+ if(i>0&&!isCta(i)&&!isCta(i-1)){const d=t-bound(i);if(d<0.15){
+   drawScene(i-1,off[1].getContext('2d'),t);X.save();X.globalAlpha=clamp(1-(d+0.15)/0.3);const z2=1.0+0.08*(d+0.15)/0.3;X.translate(540,960);X.scale(z2,z2);X.translate(-540,-960);X.drawImage(off[1],0,0);X.restore();
+   if(!SMOOTH){X.fillStyle=`rgba(255,255,255,${0.55*(1-Math.abs(d)/0.15)})`;X.fillRect(0,0,W,H);}}}
+ if(!SMOOTH&&i<TL.scenes.length-1&&!isCta(i)&&!isCta(i+1)){const d=bound(i+1)-t;if(d<0.15){X.fillStyle=`rgba(255,255,255,${0.55*(1-d/0.15)})`;X.fillRect(0,0,W,H);}}
+ titleBar(X,t);subtitle(X,t);watermark(X,t,i);}
+// ---------- Wasserzeichen (31.10.2026): Logo + Name, halbtransparent, wechselt alle 6 s die Position (schwer wegzuschneiden), außerhalb der Plattform-UI ----------
+function watermark(c,t,i){if(isCta(i))return;const spots=[[60,600],[700,560],[60,1330]];const k=Math.floor(t/6)%spots.length;const f=clamp(Math.min((t%6)/0.4,(6-t%6)/0.4));
+ const [x,y]=spots[k];c.save();c.globalAlpha=0.42*f;logo(c,x+34,y,32,t);c.font='800 34px Inter';c.textAlign='left';c.textBaseline='middle';c.lineJoin='round';c.lineWidth=6;c.strokeStyle='rgba(255,255,255,0.9)';c.strokeText('LeverLogic',x+78,y+2);c.fillStyle=COL.dark;c.fillText('LeverLogic',x+78,y+2);c.restore();}
+async function init(tl,handle){TL=tl;EVENTS=[];SHAKES=[];if(handle)HANDLE=handle;await document.fonts.load('136px Anton');await document.fonts.load('700 40px Inter');await document.fonts.load('800 40px Inter');setupScenes();EVENTS.sort((a,b)=>a.t-b.t);return EVENTS;}
+window.init=init;window.render=render;window.thumb=thumb;
+</script>
+</body></html>
