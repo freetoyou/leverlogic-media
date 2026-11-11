@@ -8,7 +8,8 @@ tl = json.load(open(f'{B}/timeline.json'))
 mode = sys.argv[1] if len(sys.argv) > 1 else 'stills'
 handle = sys.argv[2] if mode == 'video' and len(sys.argv) > 2 else '@leverlogic'
 FPS = 30
-THUMB_FRAMES = 3  # 0,1 s bei 30 fps
+# 11.11.2026 (regel_updates Nr. 6): Thumbnail-Frame am Anfang entfällt (Test). THUMB=3 setzt ihn wieder (0,1 s).
+THUMB_FRAMES = int(os.environ.get('THUMB', '0'))
 with sync_playwright() as p:
     br = p.chromium.launch(args=['--allow-file-access-from-files'])
     pg = br.new_page(viewport={'width': 1080, 'height': 1920})
