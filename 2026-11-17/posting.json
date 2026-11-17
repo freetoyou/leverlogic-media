@@ -1,0 +1,55 @@
+{
+ "date": "2026-11-17",
+ "blogId": 7954096,
+ "timezone": "Europe/Berlin",
+ "videos": [
+  {
+   "nr": 1,
+   "thema": "vending machine fake coins",
+   "video_url": "https://raw.githubusercontent.com/freetoyou/leverlogic-media/main/2026-11-17/video1.mp4",
+   "publish_at": "2026-11-17T20:35:00",
+   "caption": "How do vending machines detect fake coins 🪙 #vendingmachine #coins #howitworks #engineering #didyouknow",
+   "title": "How do vending machines detect fake coins?",
+   "first_comment": "Be honest: have you ever kicked a vending machine?",
+   "youtube_tags": [
+    "how do vending machines detect fake coins",
+    "vending machine fake coin",
+    "eddy current",
+    "how it works",
+    "engineering"
+   ]
+  },
+  {
+   "nr": 2,
+   "thema": "fridge bread stale",
+   "video_url": "https://raw.githubusercontent.com/freetoyou/leverlogic-media/main/2026-11-17/video2.mp4",
+   "publish_at": "2026-11-17T21:50:00",
+   "caption": "Does the fridge make bread stale faster 🍞 #bread #foodscience #kitchenhacks #foodfacts #didyouknow",
+   "title": "Does the fridge make bread stale faster?",
+   "first_comment": "Be honest: fridge, counter or bread box?",
+   "youtube_tags": [
+    "does the fridge make bread stale faster",
+    "why does bread go stale in the fridge",
+    "stale bread",
+    "food science",
+    "kitchen hacks"
+   ]
+  },
+  {
+   "nr": 3,
+   "thema": "plane ashtrays",
+   "video_url": "https://raw.githubusercontent.com/freetoyou/leverlogic-media/main/2026-11-17/video3.mp4",
+   "publish_at": "2026-11-17T22:55:00",
+   "caption": "Why do planes still have ashtrays ✈️ #airplane #aviation #travelfacts #weirdfacts #didyouknow",
+   "title": "Why do planes still have ashtrays?",
+   "first_comment": "Did you ever notice the ashtray on the bathroom door?",
+   "youtube_tags": [
+    "why do planes still have ashtrays",
+    "airplane ashtray",
+    "airplane bathroom ashtray",
+    "aviation facts",
+    "travel facts"
+   ]
+  }
+ ]
+}
