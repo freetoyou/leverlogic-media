@@ -1,0 +1,55 @@
+{
+ "date": "2026-11-18",
+ "blogId": 7954096,
+ "timezone": "Europe/Berlin",
+ "videos": [
+  {
+   "nr": 1,
+   "thema": "How do seatbelts know when to lock (verborgene Alltagsmechanik, Regel-6-Neuentwicklung)",
+   "video_url": "https://raw.githubusercontent.com/freetoyou/leverlogic-media/main/2026-11-18/video1.mp4",
+   "publish_at": "2026-11-18T20:35:00",
+   "caption": "How do seatbelts know when to lock 🚗 #seatbelt #carsafety #howitworks #engineering #didyouknow",
+   "title": "How do seatbelts know when to lock?",
+   "first_comment": "Be honest: has your seatbelt ever locked for no reason?",
+   "youtube_tags": [
+    "how do seatbelts know when to lock",
+    "seatbelt lock",
+    "why does my seatbelt lock",
+    "seatbelt retractor",
+    "how it works"
+   ]
+  },
+  {
+   "nr": 2,
+   "thema": "Tomato juice on planes v2 (Gewinner-Variante, Spannungskette)",
+   "video_url": "https://raw.githubusercontent.com/freetoyou/leverlogic-media/main/2026-11-18/video2.mp4",
+   "publish_at": "2026-11-18T21:50:00",
+   "caption": "Why is tomato juice better on planes 🍅 #tomatojuice #airplane #foodscience #tastebuds #didyouknow",
+   "title": "Why is tomato juice better on planes?",
+   "first_comment": "Tomato juice on a plane: yes or never?",
+   "youtube_tags": [
+    "why is tomato juice better on planes",
+    "tomato juice on planes",
+    "airplane food taste",
+    "umami",
+    "food science"
+   ]
+  },
+  {
+   "nr": 3,
+   "thema": "Why does pineapple hurt your mouth (Food-Raetsel, Enzym)",
+   "video_url": "https://raw.githubusercontent.com/freetoyou/leverlogic-media/main/2026-11-18/video3.mp4",
+   "publish_at": "2026-11-18T22:55:00",
+   "caption": "Why does pineapple hurt your mouth 🍍 #pineapple #bromelain #foodscience #foodfacts #didyouknow",
+   "title": "Why does pineapple hurt your mouth?",
+   "first_comment": "Fresh or canned pineapple: which one do you actually buy?",
+   "youtube_tags": [
+    "why does pineapple hurt your mouth",
+    "pineapple burns tongue",
+    "bromelain",
+    "pineapple enzyme",
+    "food science"
+   ]
+  }
+ ]
+}
