@@ -1,0 +1,55 @@
+{
+ "date": "2026-11-19",
+ "blogId": 7954096,
+ "timezone": "Europe/Berlin",
+ "videos": [
+  {
+   "nr": 1,
+   "thema": "Does the elevator close door button work",
+   "video_url": "https://raw.githubusercontent.com/freetoyou/leverlogic-media/main/2026-11-19/video1.mp4",
+   "publish_at": "2026-11-19T20:35:00",
+   "caption": "Does the elevator close door button work 🛗 #elevator #elevatorbutton #psychology #weirdfacts #didyouknow",
+   "title": "Does the elevator close door button work?",
+   "first_comment": "Be honest: how many times do you press it in a row?",
+   "youtube_tags": [
+    "does the elevator close door button work",
+    "elevator close door button",
+    "placebo buttons",
+    "elevator facts",
+    "weird facts"
+   ]
+  },
+  {
+   "nr": 2,
+   "thema": "Why does chewing gum lose its flavor",
+   "video_url": "https://raw.githubusercontent.com/freetoyou/leverlogic-media/main/2026-11-19/video2.mp4",
+   "publish_at": "2026-11-19T21:50:00",
+   "caption": "Why does chewing gum lose its flavor 🍬 #chewinggum #gum #foodscience #tastebuds #didyouknow",
+   "title": "Why does chewing gum lose its flavor?",
+   "first_comment": "How long do you chew gum before you spit it out?",
+   "youtube_tags": [
+    "why does chewing gum lose its flavor",
+    "gum loses flavor",
+    "chewing gum science",
+    "food science",
+    "taste"
+   ]
+  },
+  {
+   "nr": 3,
+   "thema": "Why does the shower curtain blow in",
+   "video_url": "https://raw.githubusercontent.com/freetoyou/leverlogic-media/main/2026-11-19/video3.mp4",
+   "publish_at": "2026-11-19T22:55:00",
+   "caption": "Why does the shower curtain blow in 🚿 #showercurtain #shower #physics #weirdscience #didyouknow",
+   "title": "Why does the shower curtain blow in?",
+   "first_comment": "Team fight the curtain or team let it win?",
+   "youtube_tags": [
+    "why does the shower curtain blow in",
+    "shower curtain effect",
+    "shower curtain blows in",
+    "physics",
+    "weird science"
+   ]
+  }
+ ]
+}
